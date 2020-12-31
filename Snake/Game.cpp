@@ -136,7 +136,7 @@ void Game::GenerateOutput()
 {
 	DrawLines();
 
-	for (int i = 0; i < mActors.size(); ++i)
+	for (size_t i = 0; i < mActors.size(); ++i)
 	{
 		mActors[i]->RenderToGrid();
 	}
@@ -191,6 +191,14 @@ void Game::LoadData()
 		cell_occupied[i] = new bool[cell_column_size]();
 	}
 
+	for (int i = 0; i < cell_row_size; ++i)
+	{
+		for (int j = 0; j < cell_column_size; ++j)
+		{
+			cell_unfilled.insert(i * 100 + j);
+		}
+	}
+
 	snake = new Snake(this);
 	Score* score = new Score(this);
 }
@@ -228,4 +236,29 @@ SDL_Texture* Game::GetTexture(const char* filename)
 	mTextures.insert(std::make_pair(filename, texture));
 	
 	return texture;
+}
+
+void Game::DeleteUnfilledCell(std::pair<int, int> cell)
+{
+	cell_unfilled.insert(cell.first * 100 + cell.second);
+}
+
+void Game::AddUnfilledCell(std::pair<int, int> cell)
+{
+	cell_unfilled.erase(cell.first * 100 + cell.second);
+}
+
+std::pair<int, int> Game::GetRandonUnfilledCell()
+{
+	int count = cell_unfilled.size();
+	int random = Random::GetIntRange(0, count);
+	std::unordered_set<int>::iterator it = cell_unfilled.begin();
+	int i = 0;
+	while (i++ < random)
+	{
+		++it;
+	}
+	
+	int first = (*it) / 100, second = (*it) % 100;
+	return std::pair<int, int>(first, second);
 }

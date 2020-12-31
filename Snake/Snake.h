@@ -26,7 +26,8 @@ private:
 	float forwardDistance;
 	int count;
 	std::vector<Cell> body;
-	
+	bool prev_moved;
+
 	// 0 up, 1 down, 2 left, 3 right
 	int direction;
 

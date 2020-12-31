@@ -3,6 +3,7 @@
 #include "SDL/SDL.h"
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 class Game {
 public:
@@ -19,6 +20,9 @@ public:
 	SDL_Renderer* GetRenderer() { return render; }
 	bool** GetCellOccupied() { return cell_occupied; }
 	class Snake* GetSnake() { return snake; }
+	void DeleteUnfilledCell(std::pair<int, int> cell);
+	void AddUnfilledCell(std::pair<int, int> cell);
+	std::pair<int, int> GetRandonUnfilledCell();
 
 	// The setting should be a rectangle;
 	int cell_row_size = 25;
@@ -51,6 +55,7 @@ private:
 	std::vector<class Actor*> mActors;
 	std::unordered_map<std::string, SDL_Texture*> mTextures;
 
+	std::unordered_set<int> cell_unfilled;
 	bool** cell_occupied;
 	
 	void LoadData();

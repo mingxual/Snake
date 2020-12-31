@@ -19,6 +19,9 @@ public:
 	};
 
 private:
+	// Randomly assign the point pos
+	void ResetPointPos();
+
 	std::vector<Cell> points;
 	
 	SDL_Color score_color = { 200, 0, 0, 255 };
