@@ -10,8 +10,9 @@ public:
 	void OnProcessInput(const Uint8* keyState);
 	void OnUpdate(float deltaTime);
 	void RenderToGrid();
-	std::pair<int, int> GetHeadPos() { return std::pair<int, int>(body[0].row, body[0].col); }
+	std::pair<int, int> GetHeadPos();
 	void IncrementLength();
+	int GetCount() { return mCount - 2; }
 
 	struct Cell {
 		int row;
@@ -22,14 +23,14 @@ public:
 	};
 
 private:
-	float forwardSpeed;
-	float forwardDistance;
-	int count;
+	float mForwardSpeed;
+	float mForwardDistance;
+	int mCount;
 	std::vector<Cell> body;
-	bool prev_moved;
+	bool mPrevMoved;
 
 	// 0 up, 1 down, 2 left, 3 right
-	int direction;
+	int mDirection;
 
 	SDL_Color snake_head_color = { 160, 160, 160, 255 };
 	SDL_Color snake_body_color = { 160, 160, 160, 255 };

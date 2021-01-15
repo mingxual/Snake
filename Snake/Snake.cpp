@@ -3,7 +3,7 @@
 #include <algorithm>
 
 Snake::Snake(Game* game)
-	:Actor(game), forwardSpeed(2.0f), forwardDistance(0.0f), count(2), direction(2), prev_moved(false)
+	:Actor(game), mForwardSpeed(2.0f), mForwardDistance(0.0f), mCount(2), mDirection(2), mPrevMoved(false)
 {
 	// Initial State
 	Cell head(17, 12);
@@ -21,50 +21,50 @@ Snake::Snake(Game* game)
 
 void Snake::OnProcessInput(const Uint8* keyState)
 {
-	if (prev_moved)
+	if (mPrevMoved)
 	{
-		if (keyState[SDL_SCANCODE_UP] && !keyState[SDL_SCANCODE_DOWN] && direction != 1)
+		if (keyState[SDL_SCANCODE_UP] && !keyState[SDL_SCANCODE_DOWN] && mDirection != 1)
 		{
-			direction = 0;
-			prev_moved = false;
+			mDirection = 0;
+			mPrevMoved = false;
 		}
-		else if (!keyState[SDL_SCANCODE_UP] && keyState[SDL_SCANCODE_DOWN] && direction != 0)
+		else if (!keyState[SDL_SCANCODE_UP] && keyState[SDL_SCANCODE_DOWN] && mDirection != 0)
 		{
-			direction = 1;
-			prev_moved = false;
+			mDirection = 1;
+			mPrevMoved = false;
 		}
-		else if (keyState[SDL_SCANCODE_LEFT] && !keyState[SDL_SCANCODE_RIGHT] && direction != 3)
+		else if (keyState[SDL_SCANCODE_LEFT] && !keyState[SDL_SCANCODE_RIGHT] && mDirection != 3)
 		{
-			direction = 2;
-			prev_moved = false;
+			mDirection = 2;
+			mPrevMoved = false;
 		}
-		else if (!keyState[SDL_SCANCODE_LEFT] && keyState[SDL_SCANCODE_RIGHT] && direction != 2)
+		else if (!keyState[SDL_SCANCODE_LEFT] && keyState[SDL_SCANCODE_RIGHT] && mDirection != 2)
 		{
-			direction = 3;
-			prev_moved = false;
+			mDirection = 3;
+			mPrevMoved = false;
 		}
 	}
 }
 
 void Snake::OnUpdate(float deltaTime)
 {
-	forwardDistance += forwardSpeed * deltaTime;
-	if (forwardDistance >= 1.0f)
+	mForwardDistance += mForwardSpeed * deltaTime;
+	if (mForwardDistance >= 1.0f)
 	{
-		prev_moved = true;
+		mPrevMoved = true;
 
 		bool** cell_occupied = mGame->GetCellOccupied();
-		int last_x = body[count - 1].row, last_y = body[count - 1].col;
+		int last_x = body[mCount - 1].row, last_y = body[mCount - 1].col;
 
 		cell_occupied[last_x][last_y] = false;
 		mGame->AddUnfilledCell(std::pair<int, int>(last_x, last_y));
 
-		for (int i = count - 1; i > 0; --i)
+		for (int i = mCount - 1; i > 0; --i)
 		{
 			body[i].SetPosition(body[i - 1].row, body[i - 1].col);
 		}
 
-		switch (direction) 
+		switch (mDirection) 
 		{
 			case 0:
 				body[0].row = body[0].row > 0 ? body[0].row - 1 : mGame->cell_row_size - 1;
@@ -88,12 +88,13 @@ void Snake::OnUpdate(float deltaTime)
 		if (cell_occupied[body[0].row][body[0].col])
 		{
 			SetState(ActorState::Destroy);
+			mGame->ClearSnake();
 			return;
 		}
 		cell_occupied[body[0].row][body[0].col] = true;
 		mGame->DeleteUnfilledCell(std::pair<int, int>(body[0].row, body[0].col));
 
-		forwardDistance -= 1.0f;
+		mForwardDistance -= 1.0f;
 	}
 }
 
@@ -104,7 +105,7 @@ void Snake::RenderToGrid()
 
 	SDL_SetRenderDrawColor(render, snake_body_color.r, snake_body_color.g, snake_body_color.b, snake_body_color.a);
 
-	for (int i = 0; i < count; ++i)
+	for (int i = 0; i < mCount; ++i)
 	{
 		SDL_Rect cell;
 		cell.x = body[i].col * cell_side_size;
@@ -118,10 +119,10 @@ void Snake::RenderToGrid()
 
 void Snake::IncrementLength()
 {
-	int x1 = body[count - 2].row;
-	int y1 = body[count - 2].col;
-	int x2 = body[count - 1].row;
-	int y2 = body[count - 1].col;
+	int x1 = body[mCount - 2].row;
+	int y1 = body[mCount - 2].col;
+	int x2 = body[mCount - 1].row;
+	int y2 = body[mCount - 1].col;
 
 	// Boundary check
 	int x3 = 2 * x2 - x1;
@@ -147,12 +148,12 @@ void Snake::IncrementLength()
 	// Create a cell to the tail of the snake
 	Cell next(x3, y3);
 	body.push_back(next);
-	++count;
+	++mCount;
 
-	if (count % 10 == 0)
+	if (mCount % 10 == 0)
 	{
-		forwardSpeed *= 1.1f;
-		forwardSpeed = std::min(forwardSpeed, 30.0f);
+		mForwardSpeed *= 1.1f;
+		mForwardSpeed = std::min(mForwardSpeed, 30.0f);
 	}
 
 	bool** cell_occupied = mGame->GetCellOccupied();
@@ -160,3 +161,7 @@ void Snake::IncrementLength()
 	mGame->DeleteUnfilledCell(std::pair<int, int>(x3, y3));
 }
 
+std::pair<int, int> Snake::GetHeadPos()
+{
+	return std::pair<int, int>(body[0].row, body[0].col); 
+}

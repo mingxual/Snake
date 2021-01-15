@@ -14,15 +14,14 @@ public:
 
 	void AddActor(class Actor* actor);
 	void RemoveActor(class Actor* actor);
-	void AddSprite(class SpriteComponent* sprite);
-	void RemoveSprite(class SpriteComponent* sprite);
 	SDL_Texture* GetTexture(const char* filename);
 	SDL_Renderer* GetRenderer() { return render; }
-	bool** GetCellOccupied() { return cell_occupied; }
-	class Snake* GetSnake() { return snake; }
+	bool** GetCellOccupied() { return mCellOccupied; }
+	class Snake* GetSnake() { return mSnake; }
 	void DeleteUnfilledCell(std::pair<int, int> cell);
 	void AddUnfilledCell(std::pair<int, int> cell);
 	std::pair<int, int> GetRandonUnfilledCell();
+	void ClearSnake();
 
 	// The setting should be a rectangle;
 	int cell_row_size = 25;
@@ -55,11 +54,15 @@ private:
 	std::vector<class Actor*> mActors;
 	std::unordered_map<std::string, SDL_Texture*> mTextures;
 
-	std::unordered_set<int> cell_unfilled;
-	bool** cell_occupied;
+	std::unordered_set<int> mCellUnfilled;
+	bool** mCellOccupied;
 	
 	void LoadData();
 	void UnloadData();
 
-	class Snake* snake;
+	class Snake* mSnake;
+	class Score* mScore;
+	class Font* mFont;
+	class Texture* mCurrentScore;
+	class Button* mButton;
 };
